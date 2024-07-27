@@ -4,7 +4,7 @@ import { useState } from "react";
 function TagsInput() {
   const [tags, setTags] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState([
+  const [suggestions] = useState([
     "JavaScript",
     "React",
     "CSS",
@@ -50,26 +50,28 @@ function TagsInput() {
 
   return (
     <div className="tags-input-container">
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={handleSearchChange}
-        className="tags-input"
-        placeholder="Search tags"
-      />
-      {searchQuery && filteredSuggestions.length > 0 && (
-        <ul className="suggestions-list">
-          {filteredSuggestions.map((suggestion, index) => (
-            <li
-              key={index}
-              onClick={() => handleSuggestionClick(suggestion)}
-              className="suggestion-item"
-            >
-              {suggestion}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="search-bar-container">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="search-input"
+          placeholder="Search tags"
+        />
+        {searchQuery && filteredSuggestions.length > 0 && (
+          <ul className="suggestions-list">
+            {filteredSuggestions.map((suggestion, index) => (
+              <li
+                key={index}
+                onClick={() => handleSuggestionClick(suggestion)}
+                className="suggestion-item"
+              >
+                {suggestion}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       <div className="tags-list">
         {tags.map((tag, index) => (
           <div className="tag-item" key={index}>

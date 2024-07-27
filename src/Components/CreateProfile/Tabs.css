@@ -1,0 +1,208 @@
+/* General container styles */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 800px; /* Set max width for form consistency */
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Tabs styles */
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  width: 100%; /* Ensure tabs span the full width */
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.tab.active {
+  background-color: #3b82f6; /* Blue color */
+  color: white;
+}
+
+.tab.inactive {
+  background-color: #e5e7eb; /* Gray color */
+  color: #374151; /* Dark gray color */
+}
+
+/* Form styles */
+form {
+  width: 100%; /* Ensure form spans the full width */
+}
+
+input {
+  border: 2px solid #d1d5db;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  width: 100%;
+  max-width: 600px; /* Consistent width */
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  background-color: transparent;
+}
+
+input:focus {
+  border-color: #3b82f6; /* Blue color */
+  outline: none;
+}
+
+button {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+  background-color: #2563eb; /* Darker blue on hover */
+}
+
+.bg-blue-500 {
+  background-color: #3b82f6; /* Blue color */
+  color: white;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6; /* Light gray */
+}
+
+.text-white {
+  color: white;
+}
+
+.text-gray-700 {
+  color: #374151; /* Dark gray color */
+}
+
+.text-gray-500 {
+  color: #6b7280; /* Gray color */
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.px-10 {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+.py-20 {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.rounded-3xl {
+  border-radius: 1.875rem;
+}
+
+.border-2 {
+  border-width: 2px;
+}
+
+.border-gray-200 {
+  border-color: #e5e7eb; /* Gray color */
+}
+
+.transition-opacity {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.opacity-100 {
+  opacity: 1;
+}
+
+.transition-opacity.duration-500.ease-in-out {
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Tags input styles */
+.tags-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px; /* Consistent width */
+  margin: 0 auto;
+}
+
+.tags-input {
+  width: 100%;
+  max-width: 600px; /* Consistent width */
+  padding: 0.75rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  background-color: transparent;
+}
+
+.suggestions-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 600px; /* Consistent width */
+  border: 2px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 0.75rem 0.75rem;
+  background-color: white;
+}
+
+.suggestion-item {
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.suggestion-item:hover {
+  background-color: #e5e7eb; /* Light gray on hover */
+}
+
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.tag-item {
+  display: flex;
+  align-items: center;
+  background-color: #d1d5db; /* Gray color */
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem;
+}
+
+.tag-item .text {
+  margin-right: 0.5rem;
+}
+
+.tag-item .close {
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: #9ca3af; /* Gray color */
+}
+
+.tag-item .close:hover {
+  color: #f87171; /* Red color on hover */
+}

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 function Form() {
   const { loginWithRedirect } = useAuth0();
+  const { signIn } = useAuth(); // Ensure signIn is correctly imported from useAuth
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [data, setData] = React.useState([]);
@@ -25,7 +26,9 @@ function Form() {
   };
 
   // Fetch data when the component mounts
- 
+  React.useEffect(() => {
+    fetchData();
+  }, []);
 
   //Function to check credentials
 
@@ -98,6 +101,7 @@ function Form() {
             Sign in
           </button>
           <button
+            onClick={() => loginWithRedirect()}
             className="flex rounded-xl py-3 border-2 border-2 border-gray-100 items-center justify-center gap-2 active:scale-[.98] active:duration-75 hover:scale-[1.01] ease-in-out "
           >
             <svg
@@ -131,6 +135,7 @@ function Form() {
           <p className="font-medium text-base">Don't have an account?</p>
           <button
             className="text-blue-500 font-medium ml-2"
+            onClick={() => navigate("/signup")}
           >
             Sign up
           </button>
