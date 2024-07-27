@@ -6,7 +6,8 @@ import Login from "./Components/Login/LoginForm/Form";
 import "./App.css";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Profile from "./Pages/ProfilePage/Profile";
-
+import CreateProfile from "./Pages/CreateProfile/CreateProfile";
+import BusinessPosts from "./Pages/BusinessPosts/BusinessPosts";
 function App() {
   return (
     <>
@@ -17,6 +18,11 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
 
           <Route path="/profile" element={<Profile />} />
+
+          <Route path="/businessposts" element={<BusinessPosts />} />
+
+
+          <Route path="/createprofile" element={<CreateProfile />} />
         </Routes>
       </BrowserRouter>
     </>
