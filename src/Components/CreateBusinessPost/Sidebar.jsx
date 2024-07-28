@@ -1,4 +1,15 @@
 import React, { useState } from "react";
+import SkillFilter from "./SkillFilter";
+const skills = [
+  "JavaScript",
+  "React",
+  "CSS",
+  "HTML",
+  "Node.js",
+  "Python",
+  "Java",
+  "Ruby",
+];
 
 function Sidebar({ filters, onFilterChange }) {
   const [selectedFilters, setSelectedFilters] = useState({});
@@ -30,6 +41,7 @@ function Sidebar({ filters, onFilterChange }) {
           </select>
         </div>
       ))}
+      <SkillFilter skills={skills} onSkillChange={handleSkillChange} />
     </div>
   );
 }

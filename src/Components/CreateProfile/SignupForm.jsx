@@ -7,6 +7,7 @@ function SignupForm() {
   const { loginWithRedirect } = useAuth0();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
   const [error, setError] = React.useState("");
   const [isSignupComplete, setIsSignupComplete] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState(0);
@@ -20,8 +21,15 @@ function SignupForm() {
     { role: "", company: "", duration: "" },
   ]);
 
+  // State for role tab
+  const [role, setRole] = React.useState("");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
     try {
       console.log("Trying to submit data");
       // Assuming the sign-up process is successful
@@ -29,7 +37,6 @@ function SignupForm() {
       if (result) {
         setError(""); // Clear error if sign-up is successful
         setIsSignupComplete(true); // Set signup complete to true
-        setCurrentTab(1); // Move to the next tab
       } else {
         setError(result.message || "Sign-up failed"); // Set error if sign-up fails
       }
@@ -60,9 +67,12 @@ function SignupForm() {
     setExperience(updatedExperience);
   };
 
+  const handleNext = () => setCurrentTab((prev) => prev + 1);
+  const handleBack = () => setCurrentTab((prev) => prev - 1);
+
   return (
-    <div className="bg-white rounded-3xl border-2 border-gray-200 max-w-lg mx-auto min-h-[400px] flex flex-col overflow-hidden">
-      <div className="sticky top-0 bg-white border-b-2 border-gray-200">
+    <div className="bg-white max-h-100 px-10 py-20 rounded-3xl border-2 border-gray-200">
+      <div className="stick top-0 bg-white border-b-2 border-gray-200">
         <h1 className="text-5xl font-semibold text-center mb-4 py-4">
           Sign Up!
         </h1>
@@ -94,17 +104,29 @@ function SignupForm() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
+              <div>
+                <label className="text-lg font-medium">Confirm Password</label>
+                <input
+                  className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
+                  placeholder="Confirm your password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
               {error && <div className="text-red-500 font-medium">{error}</div>}
-              <div className="flex flex-col gap-y-4">
+              <div className="flex justify-between mt-4">
                 <button
-                  type="submit"
-                  className="active:scale-[.98] active:duration-75 hover:scale-[1.01] ease-in-out py-3 rounded-xl bg-blue-500 text-white text-lg font-bold"
+                  type="button"
+                  onClick={handleNext}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-xl"
                 >
-                  Sign Up
+                  Next
                 </button>
                 <button
+                  type="button"
                   onClick={() => loginWithRedirect()}
-                  className="flex rounded-xl py-3 border-2 border-gray-100 items-center justify-center gap-2 active:scale-[.98] active:duration-75 hover:scale-[1.01] ease-in-out"
+                  className="flex rounded-xl py-3 border-2 border-gray-100 items-center justify-center gap-2"
                 >
                   <svg
                     width="24"
@@ -143,18 +165,28 @@ function SignupForm() {
               Please enter your skills
             </h1>
             <TagsInput />
-            <button
-              onClick={() => setCurrentTab(0)}
-              className="mt-4 px-4 py-2 bg-gray-300 rounded-xl"
-            >
-              Back
-            </button>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={handleBack}
+                className="px-4 py-2 bg-gray-500 text-white rounded-xl"
+              >
+                Back
+              </button>
+              <button
+                onClick={handleNext}
+                className="px-4 py-2 bg-blue-500 text-white rounded-xl"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
 
         {currentTab === 2 && (
           <div>
-            <h1 className="text-2xl font-semibold mb-4">Details</h1>
+            <h1 className="text-2xl font-semibold mb-4">
+              Please enter your details
+            </h1>
             <div>
               <label className="text-lg font-medium">Location</label>
               <input
@@ -165,104 +197,147 @@ function SignupForm() {
               />
             </div>
             <div className="mt-4">
-              <h2 className="text-lg font-medium mb-2">Education</h2>
+              <h2 className="text-lg font-medium">Education</h2>
               {education.map((edu, index) => (
-                <div key={index} className="mb-4 border-b border-gray-300 pb-4">
-                  <div>
-                    <label className="text-lg font-medium">Degree</label>
-                    <input
-                      className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
-                      placeholder="Enter degree"
-                      value={edu.degree}
-                      onChange={(e) =>
-                        updateEducation(index, "degree", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="text-lg font-medium">Institution</label>
-                    <input
-                      className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
-                      placeholder="Enter institution"
-                      value={edu.institution}
-                      onChange={(e) =>
-                        updateEducation(index, "institution", e.target.value)
-                      }
-                    />
-                  </div>
+                <div key={index} className="flex items-center space-x-4 mt-2">
+                  <input
+                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    placeholder="Degree"
+                    value={edu.degree}
+                    onChange={(e) =>
+                      updateEducation(index, "degree", e.target.value)
+                    }
+                  />
+                  <input
+                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    placeholder="Institution"
+                    value={edu.institution}
+                    onChange={(e) =>
+                      updateEducation(index, "institution", e.target.value)
+                    }
+                  />
                   <button
+                    type="button"
+                    className="px-2 py-1 bg-red-500 text-white rounded"
                     onClick={() => removeEducation(index)}
-                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded-xl"
                   >
-                    Remove
+                    X
                   </button>
                 </div>
               ))}
               <button
+                type="button"
+                className="mt-2 px-4 py-2 bg-green-500 text-white rounded-xl"
                 onClick={addEducation}
-                className="px-4 py-2 bg-blue-500 text-white rounded-xl"
               >
                 Add Education
               </button>
             </div>
+
             <div className="mt-4">
-              <h2 className="text-lg font-medium mb-2">Experience</h2>
+              <h2 className="text-lg font-medium">Experience</h2>
               {experience.map((exp, index) => (
-                <div key={index} className="mb-4 border-b border-gray-300 pb-4">
-                  <div>
-                    <label className="text-lg font-medium">Role</label>
-                    <input
-                      className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
-                      placeholder="Enter role"
-                      value={exp.role}
-                      onChange={(e) =>
-                        updateExperience(index, "role", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="text-lg font-medium">Company</label>
-                    <input
-                      className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
-                      placeholder="Enter company"
-                      value={exp.company}
-                      onChange={(e) =>
-                        updateExperience(index, "company", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="text-lg font-medium">Duration</label>
-                    <input
-                      className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
-                      placeholder="Enter duration"
-                      value={exp.duration}
-                      onChange={(e) =>
-                        updateExperience(index, "duration", e.target.value)
-                      }
-                    />
-                  </div>
+                <div key={index} className="flex items-center space-x-4 mt-2">
+                  <input
+                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    placeholder="Role"
+                    value={exp.role}
+                    onChange={(e) =>
+                      updateExperience(index, "role", e.target.value)
+                    }
+                  />
+                  <input
+                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    placeholder="Company"
+                    value={exp.company}
+                    onChange={(e) =>
+                      updateExperience(index, "company", e.target.value)
+                    }
+                  />
+                  <input
+                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    placeholder="Duration"
+                    value={exp.duration}
+                    onChange={(e) =>
+                      updateExperience(index, "duration", e.target.value)
+                    }
+                  />
                   <button
+                    type="button"
+                    className="px-2 py-1 bg-red-500 text-white rounded"
                     onClick={() => removeExperience(index)}
-                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded-xl"
                   >
-                    Remove
+                    X
                   </button>
                 </div>
               ))}
               <button
+                type="button"
+                className="mt-2 px-4 py-2 bg-green-500 text-white rounded-xl"
                 onClick={addExperience}
-                className="px-4 py-2 bg-blue-500 text-white rounded-xl"
               >
                 Add Experience
               </button>
             </div>
-            <button
-              onClick={() => setCurrentTab(1)}
-              className="mt-4 px-4 py-2 bg-gray-300 rounded-xl"
-            >
-              Back
-            </button>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={handleBack}
+                className="px-4 py-2 bg-gray-500 text-white rounded-xl"
+              >
+                Back
+              </button>
+              <button
+                onClick={handleNext}
+                className="px-4 py-2 bg-blue-500 text-white rounded-xl"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+
+        {currentTab === 3 && (
+          <div>
+            <h1 className="text-2xl font-semibold mb-4">Select your role</h1>
+            <div className="flex items-center space-x-4">
+              <label className="text-lg font-medium">Job Seeker</label>
+              <input
+                type="radio"
+                name="role"
+                value="jobSeeker"
+                checked={role === "jobSeeker"}
+                onChange={() => setRole("jobSeeker")}
+              />
+              <label className="text-lg font-medium">Entrepreneur</label>
+              <input
+                type="radio"
+                name="role"
+                value="entrepreneur"
+                checked={role === "entrepreneur"}
+                onChange={() => setRole("entrepreneur")}
+              />
+            </div>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={handleBack}
+                className="px-4 py-2 bg-gray-500 text-white rounded-xl"
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-500 text-white rounded-xl"
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isSignupComplete && (
+          <div className="text-center">
+            <h1 className="text-3xl font-semibold">Sign-up Complete!</h1>
+            <p className="text-lg">Welcome to our community!</p>
           </div>
         )}
       </div>
