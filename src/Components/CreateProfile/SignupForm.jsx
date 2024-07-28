@@ -1,71 +1,110 @@
-import * as React from "react";
+import { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import TagsInput from "./TagsInput";
 import Tabs from "./Tabs";
+import { useAuth } from "../Login/AuthContext";
+import bcrypt from 'bcryptjs';
 
 function SignupForm() {
   const { loginWithRedirect } = useAuth0();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [error, setError] = React.useState("");
-  const [isSignupComplete, setIsSignupComplete] = React.useState(false);
-  const [currentTab, setCurrentTab] = React.useState(0);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSignupComplete, setIsSignupComplete] = useState(false);
+  const [currentTab, setCurrentTab] = useState(0);
+  const { signUp } = useAuth();
 
-  // State for role tab
-  const [role, setRole] = React.useState("");
+  const [role, setRole] = useState(""); // role state
 
-  // State for job seeker details tab
-  const [location, setLocation] = React.useState("");
-  const [education, setEducation] = React.useState([
-    { degree: "", institution: "" },
-  ]);
-  const [experience, setExperience] = React.useState([
-    { role: "", company: "", duration: "" },
-  ]);
+  // Job seeker details state
+  const [location, setLocation] = useState("");
+  const [education, setEducation] = useState([{ degree: "", institution: "" }]);
+  const [experience, setExperience] = useState([{ role: "", company: "", duration: "" }]);
+  const [selectedSkills, setSelectedSkills] = useState([]);
 
-  // State for business details tab
-  const [businessName, setBusinessName] = React.useState("");
-  const [industry, setIndustry] = React.useState("");
-  const [bio, setBio] = React.useState("");
+  // Business details state
+  const [businessName, setBusinessName] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [bio, setBio] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!email || !password || !confirmPassword || !role || !location) {
+      setError("All fields must be filled out.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-    try {
-      console.log("Trying to submit data");
-      // Assuming the sign-up process is successful
-      const result = true; // Replace with actual sign-up logic
-      if (result) {
-        setError(""); // Clear error if sign-up is successful
-        setIsSignupComplete(true); // Set signup complete to true
-      } else {
-        setError(result.message || "Sign-up failed"); // Set error if sign-up fails
+
+    let profile = {};
+
+    if (role === "jobSeeker") {
+      profile.location = location;
+      if (education.length > 0) {
+        profile.education = education;
       }
-    } catch (error) {
-      console.error("Error during sign-up:", error);
-      setError("An error occurred during sign-up");
+      if (experience.length > 0) {
+        profile.experience = experience;
+      }
+      if (selectedSkills.length > 0) {
+        profile.skills = selectedSkills;
+      }
+    } else if (role === "business") {
+      profile.location = location;
+      if (businessName) {
+        profile.businessName = businessName;
+      }
+      if (industry) {
+        profile.industry = industry;
+      }
+      if (bio) {
+        profile.bio = bio;
+      }
+    } else {
+      setError("Invalid role selected.");
+      return;
+    }
+
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const newUser = {
+        email,
+        password: hashedPassword,
+        user_type: role,
+        profile,
+      };
+
+      console.log("New User Object:", newUser); // Log the user object
+
+      const success = await signUp(newUser);
+
+      if (!success) {
+        setError("Failed to create user.");
+      } else {
+        setIsSignupComplete(true);
+      }
+    } catch (err) {
+      console.error("Error creating user:", err);
+      setError("An error occurred while creating the user.");
     }
   };
 
-  // Handle adding and removing education and experience entries
-  const addEducation = () =>
-    setEducation([...education, { degree: "", institution: "" }]);
-  const removeEducation = (index) =>
-    setEducation(education.filter((_, i) => i !== index));
+  const addEducation = () => setEducation([...education, { degree: "", institution: "" }]);
+  const removeEducation = (index) => setEducation(education.filter((_, i) => i !== index));
   const updateEducation = (index, key, value) => {
     const updatedEducation = [...education];
     updatedEducation[index][key] = value;
     setEducation(updatedEducation);
   };
 
-  const addExperience = () =>
-    setExperience([...experience, { role: "", company: "", duration: "" }]);
-  const removeExperience = (index) =>
-    setExperience(experience.filter((_, i) => i !== index));
+  const addExperience = () => setExperience([...experience, { role: "", company: "", duration: "" }]);
+  const removeExperience = (index) => setExperience(experience.filter((_, i) => i !== index));
   const updateExperience = (index, key, value) => {
     const updatedExperience = [...experience];
     updatedExperience[index][key] = value;
@@ -217,7 +256,10 @@ function SignupForm() {
         {currentTab === 2 && role === "jobSeeker" && (
           <div>
             <h2 className="text-2xl font-semibold mb-4">Skills</h2>
-            <TagsInput />
+            <TagsInput
+                  selectedSkills={selectedSkills}
+                  setSelectedSkills={setSelectedSkills}
+                />
             <div className="flex justify-between mt-4">
               <button
                 type="button"
@@ -393,6 +435,7 @@ function SignupForm() {
               <button
                 type="submit"
                 className="px-4 py-2 bg-blue-500 text-white rounded-xl"
+                onClick={ () => signUp()}
               >
                 Submit
               </button>

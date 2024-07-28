@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import JobCard from "../../Components/Jobposts/JobCard";
+import JobCard from "../../Components/JobPosts/JobCard";
 import SkillFilter from "../../Components/CreateBusinessPost/SkillFilter";
 import "./BusinessPosts.css"; // Assuming you still need this
 import logo from "../../assets/logo.png";

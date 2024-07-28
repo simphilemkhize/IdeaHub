@@ -1,39 +1,42 @@
-// AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const savedAuthState = localStorage.getItem("isAuthenticatedd");
+    const savedAuthState = localStorage.getItem("isAuthenticated");
+    const savedUser = localStorage.getItem("user");
     if (savedAuthState) {
       setIsAuthenticated(JSON.parse(savedAuthState));
+      setUser(JSON.parse(savedUser));
     }
   }, []);
 
-  const signIn = async (username, password) => {
-    const isValid = await checkCredentials(username, password);
+  const signIn = async (identifier, password) => {
+    const user = await checkCredentials(identifier, password);
 
-    setIsAuthenticated(isValid);
-    if (isValid) {
-      localStorage.setItem("isAuthenticatedd", true);
+    if (user) {
+      setIsAuthenticated(true);
+      setUser(user);
+      localStorage.setItem("isAuthenticated", JSON.stringify(true));
+      localStorage.setItem("user", JSON.stringify(user));
+      return true;
+    } else {
+      return false;
     }
-    return isValid;
   };
 
-  const signUp = async (username, password) => {
-    const isValid = true; // This should ideally be based on some logic
-    if (isValid) {
-      const added = await addNewUser(username, password);
-      console.log("User added:", added); // Log to confirm user was added
-      setIsAuthenticated(added);
-      if (added) {
-        console.log("Setting localStorage");
-        localStorage.setItem("isAuthenticatedd", true);
-      }
-      return added;
+  const signUp = async (newUser) => {
+    const added = await addNewUser(newUser);
+    if (added) {
+      setIsAuthenticated(true);
+      localStorage.setItem("isAuthenticated", JSON.stringify(true));
+      localStorage.setItem("user", JSON.stringify(newUser));
+      setUser(newUser);
+      return true;
     } else {
       return false;
     }
@@ -41,11 +44,15 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem("isAuthenticatedd");
+    setUser(null);
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, signIn, signOut, signUp }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, signIn, signOut, signUp }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -53,44 +60,52 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => useContext(AuthContext);
 
-const checkCredentials = async (username, password) => {
+const checkCredentials = async (identifier, password) => {
+  const isEmail = identifier.includes("@");
+  const loginPayload = isEmail ? { email: identifier, password } : { username: identifier, password };
+
   try {
     const response = await fetch(
-      "https://ignitemetricapi.azurewebsites.net/api/getNames?"
-    );
-    const result = await response.json();
-
-    const user = result.find(
-      (user) => user.username.toLowerCase() === username.toLowerCase()
-    );
-
-    if (user) {
-      return password === user.password; // Plain text comparison (for now)
-    } else {
-      return false; // Username not found
-    }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return false; // Handle fetch error
-  }
-};
-
-const addNewUser = async (username, password) => {
-  try {
-    console.log("Adding new user");
-    const response = await fetch(
-      "https://ignitemetricapi.azurewebsites.net/api/addUser",
+      "https://ideahubfunctionapp.azurewebsites.net/api/verifyUser",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
+        body: JSON.stringify(loginPayload),
       }
     );
+    const result = await response.json();
+
+    if (response.status === 200 && result.valid) {
+      return {
+        email: result.email,
+        user_type: result.user_type,
+        profile: result.profile
+      }; // Return user details if credentials are valid
+    } else {
+      return null; // Invalid credentials
+    }
+  } catch (error) {
+    console.error("Error verifying user:", error);
+    return null; // Handle fetch error
+  }
+};
+
+const addNewUser = async (newUser) => {
+  try {
+    const response = await fetch(
+      "https://ideahubfunctionapp.azurewebsites.net/api/createUser",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+      }
+    );
+
+    console.log(newUser);
 
     if (response.status === 201) {
       return true;

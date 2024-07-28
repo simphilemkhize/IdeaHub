@@ -1,58 +1,71 @@
-import React, { useState, useEffect } from "react";
 import "./TagsInputcss.css";
+import { useState, useEffect, useRef } from "react";
 
-function TagsInput({ initialSkills = [], onSkillsChange }) {
-  const [tags, setTags] = useState(initialSkills);
+function TagsInput({ selectedSkills = [], setSelectedSkills }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions] = useState([
-    "JavaScript",
-    "React",
-    "CSS",
-    "HTML",
-    "Node.js",
-    "Ndumiso",
-  ]);
-  const [filteredSuggestions, setFilteredSuggestions] = useState(suggestions);
+  const [filteredSkills, setFilteredSkills] = useState([]);
+
+  function useDebounce(value, delay) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    const timeoutRef = useRef(null);
+
+    useEffect(() => {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+
+      return () => clearTimeout(timeoutRef.current);
+    }, [value, delay]);
+
+    return debouncedValue;
+  }
+
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   useEffect(() => {
-    setFilteredSuggestions(suggestions.filter((tag) => !tags.includes(tag)));
-  }, [tags, suggestions]);
+    if (debouncedSearchQuery.trim()) {
+      fetch(
+        `https://ideahubfunctionapp.azurewebsites.net/api/getSkills?q=${debouncedSearchQuery}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          setFilteredSkills(
+            data.filter(
+              (skill) => !selectedSkills.some((s) => s._id === skill._id)
+            )
+          );
+        })
+        .catch((error) => console.error("Error fetching skills:", error));
+    } else {
+      setFilteredSkills([]);
+    }
+  }, [debouncedSearchQuery, selectedSkills]);
 
   function handleKeyDown(e) {
     if (e.key !== "Enter") return;
     const value = e.target.value;
-    if (!value.trim()) return;
-    setTags([...tags, value]);
+    const skill = filteredSkills.find((s) => s.name === value);
+    if (!skill || selectedSkills.some((s) => s._id === skill._id)) return;
+    setSelectedSkills([...selectedSkills, skill]);
     setSearchQuery("");
-    setFilteredSuggestions(suggestions.filter((tag) => !tags.includes(tag)));
-    e.target.value = "";
-    onSkillsChange([...tags, value]);
   }
 
   function removeTag(index) {
-    const newTags = tags.filter((el, i) => i !== index);
-    setTags(newTags);
-    setFilteredSuggestions(suggestions.filter((tag) => !newTags.includes(tag)));
-    onSkillsChange(newTags);
+    const newTags = selectedSkills.filter((_, i) => i !== index);
+    setSelectedSkills(newTags);
   }
 
   function handleSearchChange(e) {
     const query = e.target.value;
     setSearchQuery(query);
-    const filtered = suggestions.filter(
-      (suggestion) =>
-        suggestion.toLowerCase().includes(query.toLowerCase()) &&
-        !tags.includes(suggestion)
-    );
-    setFilteredSuggestions(filtered);
   }
 
-  function handleSuggestionClick(suggestion) {
-    const newTags = [...tags, suggestion];
-    setTags(newTags);
-    setSearchQuery("");
-    setFilteredSuggestions(suggestions.filter((tag) => !newTags.includes(tag)));
-    onSkillsChange(newTags);
+  function handleSuggestionClick(skill) {
+    if (!selectedSkills.some((s) => s._id === skill._id)) {
+      setSelectedSkills([...selectedSkills, skill]);
+      setSearchQuery("");
+    }
   }
 
   return (
@@ -63,38 +76,33 @@ function TagsInput({ initialSkills = [], onSkillsChange }) {
           value={searchQuery}
           onChange={handleSearchChange}
           className="search-input"
-          placeholder="Search tags"
+          placeholder="Search skills"
+          onKeyDown={handleKeyDown}
         />
-        {searchQuery && filteredSuggestions.length > 0 && (
+        {searchQuery && filteredSkills.length > 0 && (
           <ul className="suggestions-list">
-            {filteredSuggestions.map((suggestion, index) => (
+            {filteredSkills.map((skill) => (
               <li
-                key={index}
-                onClick={() => handleSuggestionClick(suggestion)}
+                key={skill._id}
+                onClick={() => handleSuggestionClick(skill)}
                 className="suggestion-item"
               >
-                {suggestion}
+                {skill.name}
               </li>
             ))}
           </ul>
         )}
       </div>
       <div className="tags-list">
-        {tags.map((tag, index) => (
-          <div className="tag-item" key={index}>
-            <span className="text">{tag}</span>
+        {selectedSkills.map((skill, index) => (
+          <div className="tag-item" key={skill._id}>
+            <span className="text">{skill.name}</span>
             <span className="close" onClick={() => removeTag(index)}>
               &times;
             </span>
           </div>
         ))}
       </div>
-      <input
-        onKeyDown={handleKeyDown}
-        type="text"
-        className="tags-input"
-        placeholder="Type something"
-      />
     </div>
   );
 }

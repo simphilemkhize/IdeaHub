@@ -3,7 +3,7 @@ import { PencilIcon } from "@heroicons/react/solid"; // You need to install @her
 import TagsInput from "../../Components/CreateProfile/TagsInput";
 import logo from "../../assets/logo.png";
 
-function Profile() {
+function Profile({ user }) {
   const [isEditable, setIsEditable] = useState({
     name: false,
     surname: false,
@@ -20,25 +20,7 @@ function Profile() {
     location: useRef(null),
   };
 
-  const [user, setUser] = useState({
-    name: "Lusanda",
-    surname: "Shongwe",
-    role: "Business",
-    email: "lshongwe@yahoo.com",
-    contactNumber: "+1234567890",
-    location: "Johannesburg",
-    companyLogo: logo,
-    education: [
-      {
-        degree: "BSC Computer Science",
-        institution: "University of the Witwatersrand",
-      },
-    ],
-    experience: [
-      { role: "Junior Web Dev", company: "Sample Company", duration: "1 year" },
-    ],
-    skills: ["JavaScript", "React"], // Initial skills
-  });
+  const [userState, setUserState] = useState(user);
 
   const handleEditClick = (field) => {
     setIsEditable({ ...isEditable, [field]: !isEditable[field] });
@@ -48,47 +30,69 @@ function Profile() {
   };
 
   const handleInputChange = (field, value) => {
-    setUser({ ...user, [field]: value });
+    setUserState({ ...userState, [field]: value });
   };
 
   const handleEducationChange = (index, key, value) => {
-    const updatedEducation = [...user.education];
+    const updatedEducation = [...userState.education];
     updatedEducation[index][key] = value;
-    setUser({ ...user, education: updatedEducation });
+    setUserState({ ...userState, education: updatedEducation });
   };
 
   const handleExperienceChange = (index, key, value) => {
-    const updatedExperience = [...user.experience];
+    const updatedExperience = [...userState.experience];
     updatedExperience[index][key] = value;
-    setUser({ ...user, experience: updatedExperience });
+    setUserState({ ...userState, experience: updatedExperience });
   };
 
   const addEducation = () =>
-    setUser({
-      ...user,
-      education: [...user.education, { degree: "", institution: "" }],
+    setUserState({
+      ...userState,
+      education: [...userState.education, { degree: "", institution: "" }],
     });
 
   const removeEducation = (index) =>
-    setUser({
-      ...user,
-      education: user.education.filter((_, i) => i !== index),
+    setUserState({
+      ...userState,
+      education: userState.education.filter((_, i) => i !== index),
     });
 
   const addExperience = () =>
-    setUser({
-      ...user,
-      experience: [...user.experience, { role: "", company: "", duration: "" }],
+    setUserState({
+      ...userState,
+      experience: [
+        ...userState.experience,
+        { role: "", company: "", duration: "" },
+      ],
     });
 
   const removeExperience = (index) =>
-    setUser({
-      ...user,
-      experience: user.experience.filter((_, i) => i !== index),
+    setUserState({
+      ...userState,
+      experience: userState.experience.filter((_, i) => i !== index),
     });
 
   const handleSkillsChange = (newSkills) => {
-    setUser({ ...user, skills: newSkills });
+    setUserState({ ...userState, skills: newSkills });
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch(
+        "https://ideahubfunctionapp.azurewebsites.net/api/editUser",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userState),
+        }
+      );
+      const result = await response.json();
+      console.log("User updated successfully:", result);
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
   };
 
   return (
@@ -98,36 +102,35 @@ function Profile() {
           className="w-12 h-12 rounded-full mr-4 flex items-center justify-center border border-gray-300 overflow-hidden"
           style={{ width: "12", height: "12" }}
         >
-          {user.companyLogo ? (
+          {userState.companyLogo ? (
             <img
               src={logo}
-              alt={`${user.name} logo`}
+              alt={`${userState.name} logo`}
               className="w-full h-full object-cover"
             />
           ) : (
             <span className="text-gray-700 font-bold">Logo</span>
           )}
         </div>
-        {/* Placeholder for smaller profile picture */}
         <div>
           <h2 className="text-lg font-bold">
-            {user.name} {user.surname}
+            {userState.name} {userState.surname}
           </h2>
-          <p className="text-sm text-gray-500">{user.role}</p>
+          <p className="text-sm text-gray-500">{userState.role}</p>
         </div>
       </div>
       <form className="w-full max-w-4xl space-y-6 px-4">
         {[
-          { label: "Name", value: user.name, field: "name" },
-          { label: "Surname", value: user.surname, field: "surname" },
-          { label: "Role", value: user.role, field: "role", readOnly: true },
-          { label: "Email", value: user.email, field: "email", readOnly: true },
+          { label: "Name", value: userState.name, field: "name" },
+          { label: "Surname", value: userState.surname, field: "surname" },
+          { label: "Role", value: userState.role, field: "role", readOnly: true },
+          { label: "Email", value: userState.email, field: "email", readOnly: true },
           {
             label: "Contact Number",
-            value: user.contactNumber,
+            value: userState.contactNumber,
             field: "contactNumber",
           },
-          { label: "Location", value: user.location, field: "location" },
+          { label: "Location", value: userState.location, field: "location" },
         ].map(({ label, value, field, readOnly }) => (
           <div key={field} className="flex items-center">
             <label
@@ -159,7 +162,7 @@ function Profile() {
         ))}
         <div className="mt-4">
           <h2 className="text-lg font-medium">Education</h2>
-          {user.education.map((edu, index) => (
+          {userState.education.map((edu, index) => (
             <div
               key={index}
               className="flex items-center space-x-4 mt-2 bg-white p-4 rounded-lg"
@@ -199,7 +202,7 @@ function Profile() {
         </div>
         <div className="mt-4">
           <h2 className="text-lg font-medium">Experience</h2>
-          {user.experience.map((exp, index) => (
+          {userState.experience.map((exp, index) => (
             <div
               key={index}
               className="flex items-center space-x-4 mt-2 bg-white p-4 rounded-lg"
@@ -248,10 +251,17 @@ function Profile() {
         <div className="mt-4">
           <h2 className="text-lg font-medium">Skills</h2>
           <TagsInput
-            initialSkills={user.skills}
+            initialSkills={userState.skills}
             onSkillsChange={handleSkillsChange}
           />
         </div>
+        <button
+          type="button"
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-xl"
+          onClick={handleSave}
+        >
+          Save
+        </button>
       </form>
     </div>
   );
