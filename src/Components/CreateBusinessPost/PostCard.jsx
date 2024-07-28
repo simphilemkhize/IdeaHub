@@ -17,16 +17,22 @@ function PostCard({
     <div className="bg-white border border-gray-300 rounded-lg shadow-md p-6 mx-auto w-full max-w-3xl">
       <div className="flex items-center mb-4">
         <div
-          className="w-12 h-12 rounded-full mr-4 flex items-center justify-center border border-gray-300"
+          className="w-12 h-12 rounded-full mr-4 flex items-center justify-center border border-gray-300 overflow-hidden"
           style={{ width: "48px", height: "48px" }}
         >
-          <span className="text-gray-700 font-bold">
-            {companyLogo ? "" : "Logo"}
-          </span>
+          {companyLogo ? (
+            <img
+              src={companyLogo}
+              alt={`${companyName} logo`}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-gray-700 font-bold">Logo</span>
+          )}
         </div>
         <div>
-          <p className="text-gray-800 font-semibold text-lg">{companyName}</p>
-          <p className="text-gray-700 font-bold text-xl mt-1">{title}</p>
+          <p className="text-gray-500 text-sm">{companyName}</p>
+          <p className="text-gray-800 font-semibold text-lg">{title}</p>
         </div>
       </div>
       <div className="bg-gray-100 p-4 rounded-lg mb-4 flex items-center justify-between">

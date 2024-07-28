@@ -1,24 +1,28 @@
 import React, { useState } from "react";
-import "./Modal.css";
+import "./Modal.css"; // Keep if there are specific styles you need
+import TagsInput from "../CreateProfile/TagsInput";
 
 const Modal = ({ closeModal, onSubmit, defaultValue }) => {
   const [formState, setFormState] = useState(
     defaultValue || {
-      title: "", // Change here
+      title: "",
       description: "",
-      status: "open",
+      salary: "",
+      location: "",
+      skills: ["Java", "JavaScript", "React"],
     }
   );
   const [errors, setErrors] = useState("");
 
   const validateForm = () => {
-    if (formState.ticketnumber && formState.description && formState.status) {
+    const { title, description, salary, location, skills } = formState;
+    if (title && description && salary && location && skills.length > 0) {
       setErrors("");
       return true;
     } else {
       let errorFields = [];
       for (const [key, value] of Object.entries(formState)) {
-        if (!value) {
+        if (!value || (Array.isArray(value) && value.length === 0)) {
           errorFields.push(key);
         }
       }
@@ -31,6 +35,10 @@ const Modal = ({ closeModal, onSubmit, defaultValue }) => {
     setFormState({ ...formState, [e.target.name]: e.target.value });
   };
 
+  const handleSkillsChange = (newSkills) => {
+    setFormState({ ...formState, skills: newSkills });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -41,45 +49,99 @@ const Modal = ({ closeModal, onSubmit, defaultValue }) => {
     closeModal();
   };
 
+  const handleOutsideClick = (e) => {
+    if (e.target.classList.contains("modal-container")) {
+      closeModal();
+    }
+  };
+
   return (
     <div
-      className="modal-container"
-      onClick={(e) => {
-        if (e.target.className === "modal-container") closeModal();
-      }}
+      className="modal-container fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+      onClick={handleOutsideClick}
     >
-      <div className="modal">
+      <div className="modal bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
         <form>
-          <div className="form-group">
-            <label htmlFor="Title">Title</label> {/* Change here */}
+          <div className="form-group mb-4">
+            <label
+              htmlFor="title"
+              className="block text-gray-700 font-semibold mb-2"
+            >
+              Title
+            </label>
             <textarea
               name="title"
               onChange={handleChange}
               value={formState.title}
+              className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="description"
+              className="block text-gray-700 font-semibold mb-2"
+            >
+              Description
+            </label>
             <textarea
               name="description"
               onChange={handleChange}
               value={formState.description}
+              className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="status">Status</label>
-            <select
-              name="status"
-              onChange={handleChange}
-              value={formState.status}
+          <div className="form-group mb-4">
+            <label
+              htmlFor="salary"
+              className="block text-gray-700 font-semibold mb-2"
             >
-              <option value="closed">Closed</option>
-              <option value="open">Open</option>
-              <option value="unresolved">Unresolved</option>
-            </select>
+              Salary
+            </label>
+            <input
+              type="text"
+              name="salary"
+              onChange={handleChange}
+              value={formState.salary}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
           </div>
-          {errors && <div className="error">{`Please include: ${errors}`}</div>}
-          <button type="submit" className="btn" onClick={handleSubmit}>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="location"
+              className="block text-gray-700 font-semibold mb-2"
+            >
+              Location
+            </label>
+            <input
+              type="text"
+              name="location"
+              onChange={handleChange}
+              value={formState.location}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="skills"
+              className="block text-gray-700 font-semibold mb-2"
+            >
+              Skills
+            </label>
+            <TagsInput
+              tags={formState.skills}
+              onChange={handleSkillsChange}
+              placeholder="Add skills"
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+          {errors && (
+            <div className="error text-red-500 mb-4">{`Please include: ${errors}`}</div>
+          )}
+          <button
+            type="submit"
+            className="w-full py-2 bg-blue-500 text-white rounded"
+            onClick={handleSubmit}
+          >
             Submit
           </button>
         </form>

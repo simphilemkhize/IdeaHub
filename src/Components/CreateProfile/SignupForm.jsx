@@ -123,7 +123,7 @@ function SignupForm() {
                 >
                   Next
                 </button>
-                <button
+                {/* <button
                   type="button"
                   onClick={() => loginWithRedirect()}
                   className="flex rounded-xl py-3 border-2 border-gray-100 items-center justify-center gap-2"
@@ -153,7 +153,7 @@ function SignupForm() {
                     />
                   </svg>
                   Sign up with Google
-                </button>
+                </button> */}
               </div>
             </form>
           </>

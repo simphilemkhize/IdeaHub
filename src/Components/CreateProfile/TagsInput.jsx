@@ -1,8 +1,8 @@
+import React, { useState, useEffect } from "react";
 import "./TagsInputcss.css";
-import { useState } from "react";
 
-function TagsInput() {
-  const [tags, setTags] = useState([]);
+function TagsInput({ initialSkills = [], onSkillsChange }) {
+  const [tags, setTags] = useState(initialSkills);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions] = useState([
     "JavaScript",
@@ -14,6 +14,10 @@ function TagsInput() {
   ]);
   const [filteredSuggestions, setFilteredSuggestions] = useState(suggestions);
 
+  useEffect(() => {
+    setFilteredSuggestions(suggestions.filter((tag) => !tags.includes(tag)));
+  }, [tags, suggestions]);
+
   function handleKeyDown(e) {
     if (e.key !== "Enter") return;
     const value = e.target.value;
@@ -22,12 +26,14 @@ function TagsInput() {
     setSearchQuery("");
     setFilteredSuggestions(suggestions.filter((tag) => !tags.includes(tag)));
     e.target.value = "";
+    onSkillsChange([...tags, value]);
   }
 
   function removeTag(index) {
     const newTags = tags.filter((el, i) => i !== index);
     setTags(newTags);
     setFilteredSuggestions(suggestions.filter((tag) => !newTags.includes(tag)));
+    onSkillsChange(newTags);
   }
 
   function handleSearchChange(e) {
@@ -46,6 +52,7 @@ function TagsInput() {
     setTags(newTags);
     setSearchQuery("");
     setFilteredSuggestions(suggestions.filter((tag) => !newTags.includes(tag)));
+    onSkillsChange(newTags);
   }
 
   return (
