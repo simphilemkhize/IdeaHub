@@ -20,6 +20,7 @@ import ProtectedRoute from "./Components/Login/LoginForm/ProtectedRoute"; // Mak
 import { useAuth } from "./Components/Login/AuthContext"; // Custom Auth Context (if you have one)
 import JobPosts from "./Pages/JobPosts/JobPosts";
 import SignupPage from "./Pages/ProfilePage/SignupPage/SignupPage";
+
 const LogoutButton = () => {
   const { logout } = useAuth0();
   const { signOut } = useAuth();
@@ -46,7 +47,7 @@ const LogoutButton = () => {
 
 export function App() {
   const { isAuthenticated, isLoading } = useAuth0();
-  const { isAuthenticated: isAuthenticatedCustom } = useAuth(); // If using custom auth context
+  const { isAuthenticated: isAuthenticatedCustom, user } = useAuth(); // If using custom auth context
   const [color, setColor] = useState("#224d8f");
   const [activeMenuItem, setActiveMenuItem] = useState("Dashboard");
 
@@ -97,43 +98,37 @@ export function App() {
             <FontAwesomeIcon icon={faUser} className="mr-2" />
             Profile
           </Link>
-          <Link
-            to="/createprofile"
-            className={`flex items-center justify-start px-4 py-3 ${
-              activeMenuItem === "CreateProfile"
-                ? "bg-gray-700 text-gray-200 font-bold text-sm rounded-lg"
-                : "text-gray-700 font-bold text-sm"
-            }`}
-            onClick={() => handleMenuItemClick("CreateProfile")}
-          >
-            <FontAwesomeIcon icon={faCog} className="mr-2" />
-            Create Profile
-          </Link>
-          <Link
-            to="/businessposts"
-            className={`flex items-center justify-start px-4 py-3 ${
-              activeMenuItem === "BusinessPosts"
-                ? "bg-gray-700 text-gray-200 font-bold text-sm rounded-lg"
-                : "text-gray-700 font-bold text-sm"
-            }`}
-            onClick={() => handleMenuItemClick("BusinessPosts")}
-          >
-            <FontAwesomeIcon icon={faBell} className="mr-2" />
-            Business Posts
-          </Link>
 
-          <Link
-            to="/jobposts"
-            className={`flex items-center justify-start px-4 py-3 ${
-              activeMenuItem === "JobPosts"
-                ? "bg-gray-700 text-gray-200 font-bold text-sm rounded-lg"
-                : "text-gray-700 font-bold text-sm"
-            }`}
-            onClick={() => handleMenuItemClick("JobPosts")}
-          >
-            <FontAwesomeIcon icon={faBell} className="mr-2" />
-            Job Posts
-          </Link>
+          {user?.user_type === "business_owner" && (
+            <Link
+              to="/businessposts"
+              className={`flex items-center justify-start px-4 py-3 ${
+                activeMenuItem === "BusinessPosts"
+                  ? "bg-gray-700 text-gray-200 font-bold text-sm rounded-lg"
+                  : "text-gray-700 font-bold text-sm"
+              }`}
+              onClick={() => handleMenuItemClick("BusinessPosts")}
+            >
+              <FontAwesomeIcon icon={faBell} className="mr-2" />
+              Business Posts
+            </Link>
+          )}
+
+          {user?.user_type === "job_seeker" && (
+            <Link
+              to="/jobposts"
+              className={`flex items-center justify-start px-4 py-3 ${
+                activeMenuItem === "JobPosts"
+                  ? "bg-gray-700 text-gray-200 font-bold text-sm rounded-lg"
+                  : "text-gray-700 font-bold text-sm"
+              }`}
+              onClick={() => handleMenuItemClick("JobPosts")}
+            >
+              <FontAwesomeIcon icon={faBell} className="mr-2" />
+              Job Posts
+            </Link>
+          )}
+
           <LogoutButton />
         </div>
         <div className="flex-1 overflow-y-auto">
@@ -160,16 +155,18 @@ export function App() {
               path="/createprofile"
               element={<ProtectedRoute element={<CreateProfile />} />}
             />
-            <Route
-              path="/businessposts"
-              element={<ProtectedRoute element={<BusinessPosts />} />}
-            />
-
-            <Route
-              path="/jobposts"
-              element={<ProtectedRoute element={<JobPosts />} />}
-            />
-
+            {user?.user_type === "business_owner" && (
+              <Route
+                path="/businessposts"
+                element={<ProtectedRoute element={<BusinessPosts />} />}
+              />
+            )}
+            {user?.user_type === "job_seeker" && (
+              <Route
+                path="/jobposts"
+                element={<ProtectedRoute element={<JobPosts />} />}
+              />
+            )}
             <Route path="/signup" element={<SignupPage />} />
           </Routes>
         </div>

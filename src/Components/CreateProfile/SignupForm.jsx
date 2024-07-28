@@ -5,6 +5,8 @@ import Tabs from "./Tabs";
 import { useAuth } from "../Login/AuthContext";
 import bcrypt from 'bcryptjs';
 
+
+
 function SignupForm() {
   const { loginWithRedirect } = useAuth0();
   const [email, setEmail] = useState("");

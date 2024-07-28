@@ -100,7 +100,7 @@ function Form() {
           >
             Sign in
           </button>
-          <button
+          {/* <button
             onClick={() => loginWithRedirect()}
             className="flex rounded-xl py-3 border-2 border-2 border-gray-100 items-center justify-center gap-2 active:scale-[.98] active:duration-75 hover:scale-[1.01] ease-in-out "
           >
@@ -129,7 +129,7 @@ function Form() {
               />
             </svg>
             Sign in with Google
-          </button>
+          </button> */}
         </div>
         <div className="mt-8 flex justify-center items-center">
           <p className="font-medium text-base">Don't have an account?</p>
