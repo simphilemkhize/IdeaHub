@@ -7,16 +7,24 @@ const Modal = ({ closeModal, onSubmit, defaultValue }) => {
     defaultValue || {
       title: "",
       description: "",
-      salary: "",
+      salaryMin: "",
+      salaryMax: "",
       location: "",
-      skills: ["Java", "JavaScript", "React"],
+      skills: [],
     }
   );
   const [errors, setErrors] = useState("");
 
   const validateForm = () => {
-    const { title, description, salary, location, skills } = formState;
-    if (title && description && salary && location && skills.length > 0) {
+    const { title, description, salaryMin, salaryMax, location, skills } = formState;
+    if (
+      title &&
+      description &&
+      salaryMin &&
+      salaryMax &&
+      location &&
+      skills.length > 0
+    ) {
       setErrors("");
       return true;
     } else {
@@ -39,10 +47,38 @@ const Modal = ({ closeModal, onSubmit, defaultValue }) => {
     setFormState({ ...formState, skills: newSkills });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) return;
+
+    const postData = {
+      title: formState.title,
+      description: formState.description,
+      salary: {
+        min: formState.salaryMin,
+        max: formState.salaryMax,
+      },
+      location: formState.location,
+      skills: formState.skills,
+    };
+
+    try {
+      const response = await fetch(
+        "https://ideahubfunctionapp.azurewebsites.net/api/addBusinessPost",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        }
+      );
+      const result = await response.json();
+      console.log("Business post created successfully:", result);
+    } catch (error) {
+      console.error("Error creating business post:", error);
+    }
 
     onSubmit(formState);
 
@@ -61,7 +97,7 @@ const Modal = ({ closeModal, onSubmit, defaultValue }) => {
       onClick={handleOutsideClick}
     >
       <div className="modal bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="form-group mb-4">
             <label
               htmlFor="title"
@@ -92,16 +128,31 @@ const Modal = ({ closeModal, onSubmit, defaultValue }) => {
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="salary"
+              htmlFor="salaryMin"
               className="block text-gray-700 font-semibold mb-2"
             >
-              Salary
+              Salary Min
             </label>
             <input
-              type="text"
-              name="salary"
+              type="number"
+              name="salaryMin"
               onChange={handleChange}
-              value={formState.salary}
+              value={formState.salaryMin}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="salaryMax"
+              className="block text-gray-700 font-semibold mb-2"
+            >
+              Salary Max
+            </label>
+            <input
+              type="number"
+              name="salaryMax"
+              onChange={handleChange}
+              value={formState.salaryMax}
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
@@ -128,9 +179,8 @@ const Modal = ({ closeModal, onSubmit, defaultValue }) => {
               Skills
             </label>
             <TagsInput
-              tags={formState.skills}
-              onChange={handleSkillsChange}
-              placeholder="Add skills"
+              selectedSkills={formState.skills}
+              setSelectedSkills={handleSkillsChange}
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
@@ -140,7 +190,6 @@ const Modal = ({ closeModal, onSubmit, defaultValue }) => {
           <button
             type="submit"
             className="w-full py-2 bg-blue-500 text-white rounded"
-            onClick={handleSubmit}
           >
             Submit
           </button>
