@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import JobCard from "../../Components/CreateBusinessPost/JobCard";
+import JobCard from "../../Components/Jobposts/JobCard";
 import SkillFilter from "../../Components/CreateBusinessPost/SkillFilter";
-import "./Modal.css"; // Assuming you still need this
 import "./BusinessPosts.css"; // Assuming you still need this
 import logo from "../../assets/logo.png";
 import bg from "../../assets/bg.jpg";

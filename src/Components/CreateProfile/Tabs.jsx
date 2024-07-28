@@ -1,7 +1,6 @@
 import * as React from "react";
 
-function Tabs({ currentTab, setCurrentTab }) {
-  const tabs = ["Account", "Skills", "Details", "Role"];
+function Tabs({ currentTab, setCurrentTab, tabs }) {
 
   return (
     <div className="flex space-x-4">

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { FaDollarSign, FaMapMarkerAlt, FaCalendarDay } from "react-icons/fa";
-import TagsInput from "./TagsInput"; // Import your simplified TagsInput component
-
+import TagsInput from "../CreateBusinessPost/TagsInput";
 function JobCard({
   companyName,
   companyLogo,

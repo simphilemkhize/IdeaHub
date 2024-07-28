@@ -18,7 +18,8 @@ import CreateProfile from "./Pages/CreateProfile/CreateProfile";
 import BusinessPosts from "./Pages/BusinessPosts/BusinessPosts";
 import ProtectedRoute from "./Components/Login/LoginForm/ProtectedRoute"; // Make sure to create this component
 import { useAuth } from "./Components/Login/AuthContext"; // Custom Auth Context (if you have one)
-
+import JobPosts from "./Pages/JobPosts/JobPosts";
+import SignupPage from "./Pages/ProfilePage/SignupPage/SignupPage";
 const LogoutButton = () => {
   const { logout } = useAuth0();
   const { signOut } = useAuth();
@@ -120,6 +121,19 @@ export function App() {
             <FontAwesomeIcon icon={faBell} className="mr-2" />
             Business Posts
           </Link>
+
+          <Link
+            to="/jobposts"
+            className={`flex items-center justify-start px-4 py-3 ${
+              activeMenuItem === "JobPosts"
+                ? "bg-gray-700 text-gray-200 font-bold text-sm rounded-lg"
+                : "text-gray-700 font-bold text-sm"
+            }`}
+            onClick={() => handleMenuItemClick("JobPosts")}
+          >
+            <FontAwesomeIcon icon={faBell} className="mr-2" />
+            Job Posts
+          </Link>
           <LogoutButton />
         </div>
         <div className="flex-1 overflow-y-auto">
@@ -150,6 +164,13 @@ export function App() {
               path="/businessposts"
               element={<ProtectedRoute element={<BusinessPosts />} />}
             />
+
+            <Route
+              path="/jobposts"
+              element={<ProtectedRoute element={<JobPosts />} />}
+            />
+
+            <Route path="/signup" element={<SignupPage />} />
           </Routes>
         </div>
       </div>

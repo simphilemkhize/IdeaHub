@@ -12,7 +12,10 @@ function SignupForm() {
   const [isSignupComplete, setIsSignupComplete] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState(0);
 
-  // State for details tab
+  // State for role tab
+  const [role, setRole] = React.useState("");
+
+  // State for job seeker details tab
   const [location, setLocation] = React.useState("");
   const [education, setEducation] = React.useState([
     { degree: "", institution: "" },
@@ -21,8 +24,10 @@ function SignupForm() {
     { role: "", company: "", duration: "" },
   ]);
 
-  // State for role tab
-  const [role, setRole] = React.useState("");
+  // State for business details tab
+  const [businessName, setBusinessName] = React.useState("");
+  const [industry, setIndustry] = React.useState("");
+  const [bio, setBio] = React.useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,13 +75,23 @@ function SignupForm() {
   const handleNext = () => setCurrentTab((prev) => prev + 1);
   const handleBack = () => setCurrentTab((prev) => prev - 1);
 
+  const tabs = role
+    ? role === "jobSeeker"
+      ? ["Account", "Role", "Skills", "Details"]
+      : ["Account", "Role", "Details"]
+    : ["Account", "Role"];
+
   return (
     <div className="bg-white max-h-100 px-10 py-20 rounded-3xl border-2 border-gray-200">
       <div className="stick top-0 bg-white border-b-2 border-gray-200">
         <h1 className="text-5xl font-semibold text-center mb-4 py-4">
           Sign Up!
         </h1>
-        <Tabs currentTab={currentTab} setCurrentTab={setCurrentTab} />
+        <Tabs
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          tabs={tabs}
+        />
       </div>
       <div className="flex-1 overflow-auto p-6">
         {currentTab === 0 && (
@@ -158,21 +173,39 @@ function SignupForm() {
             </form>
           </>
         )}
-
         {currentTab === 1 && (
           <div>
-            <h1 className="text-2xl font-semibold mb-4">
-              Please enter your skills
-            </h1>
-            <TagsInput />
+            <h2 className="text-2xl font-semibold mb-4">Select Role</h2>
+            <div className="flex space-x-4">
+              <button
+                className={`px-4 py-2 rounded-xl ${
+                  role === "jobSeeker"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+                onClick={() => setRole("jobSeeker")}
+              >
+                Job Seeker
+              </button>
+              <button
+                className={`px-4 py-2 rounded-xl ${
+                  role === "business" ? "bg-blue-500 text-white" : "bg-gray-200"
+                }`}
+                onClick={() => setRole("business")}
+              >
+                Business
+              </button>
+            </div>
             <div className="flex justify-between mt-4">
               <button
+                type="button"
                 onClick={handleBack}
                 className="px-4 py-2 bg-gray-500 text-white rounded-xl"
               >
                 Back
               </button>
               <button
+                type="button"
                 onClick={handleNext}
                 className="px-4 py-2 bg-blue-500 text-white rounded-xl"
               >
@@ -181,12 +214,79 @@ function SignupForm() {
             </div>
           </div>
         )}
-
-        {currentTab === 2 && (
+        {currentTab === 2 && role === "jobSeeker" && (
           <div>
-            <h1 className="text-2xl font-semibold mb-4">
-              Please enter your details
-            </h1>
+            <h2 className="text-2xl font-semibold mb-4">Skills</h2>
+            <TagsInput />
+            <div className="flex justify-between mt-4">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="px-4 py-2 bg-gray-500 text-white rounded-xl"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={handleNext}
+                className="px-4 py-2 bg-blue-500 text-white rounded-xl"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+        {currentTab === 2 && role === "business" && (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Business Details</h2>
+            <div>
+              <label className="text-lg font-medium">Business Name</label>
+              <input
+                className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
+                placeholder="Enter your business name"
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-lg font-medium">Industry</label>
+              <input
+                className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
+                placeholder="Enter your industry"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-lg font-medium">Bio</label>
+              <textarea
+                className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
+                placeholder="Tell us about your business"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-between mt-4">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="px-4 py-2 bg-gray-500 text-white rounded-xl"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="px-4 py-2 bg-blue-500 text-white rounded-xl"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        )}
+        {currentTab === 3 && role === "jobSeeker" && (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Job Seeker Details</h2>
             <div>
               <label className="text-lg font-medium">Location</label>
               <input
@@ -196,12 +296,12 @@ function SignupForm() {
                 onChange={(e) => setLocation(e.target.value)}
               />
             </div>
-            <div className="mt-4">
-              <h2 className="text-lg font-medium">Education</h2>
+            <div>
+              <label className="text-lg font-medium">Education</label>
               {education.map((edu, index) => (
-                <div key={index} className="flex items-center space-x-4 mt-2">
+                <div key={index} className="flex space-x-4 mt-2">
                   <input
-                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
                     placeholder="Degree"
                     value={edu.degree}
                     onChange={(e) =>
@@ -209,37 +309,38 @@ function SignupForm() {
                     }
                   />
                   <input
-                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
                     placeholder="Institution"
                     value={edu.institution}
                     onChange={(e) =>
                       updateEducation(index, "institution", e.target.value)
                     }
                   />
-                  <button
-                    type="button"
-                    className="px-2 py-1 bg-red-500 text-white rounded"
-                    onClick={() => removeEducation(index)}
-                  >
-                    X
-                  </button>
+                  {index > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => removeEducation(index)}
+                      className="px-4 py-2 bg-red-500 text-white rounded-xl"
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
               ))}
               <button
                 type="button"
-                className="mt-2 px-4 py-2 bg-green-500 text-white rounded-xl"
                 onClick={addEducation}
+                className="px-4 py-2 bg-blue-500 text-white rounded-xl mt-2"
               >
                 Add Education
               </button>
             </div>
-
-            <div className="mt-4">
-              <h2 className="text-lg font-medium">Experience</h2>
+            <div>
+              <label className="text-lg font-medium">Experience</label>
               {experience.map((exp, index) => (
-                <div key={index} className="flex items-center space-x-4 mt-2">
+                <div key={index} className="flex space-x-4 mt-2">
                   <input
-                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
                     placeholder="Role"
                     value={exp.role}
                     onChange={(e) =>
@@ -247,7 +348,7 @@ function SignupForm() {
                     }
                   />
                   <input
-                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
                     placeholder="Company"
                     value={exp.company}
                     onChange={(e) =>
@@ -255,70 +356,35 @@ function SignupForm() {
                     }
                   />
                   <input
-                    className="flex-1 border-2 border-gray-100 rounded-xl p-4 bg-transparent focus:border-blue-500 focus:outline-none"
+                    className="w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent focus:border-blue-500 focus:outline-none"
                     placeholder="Duration"
                     value={exp.duration}
                     onChange={(e) =>
                       updateExperience(index, "duration", e.target.value)
                     }
                   />
-                  <button
-                    type="button"
-                    className="px-2 py-1 bg-red-500 text-white rounded"
-                    onClick={() => removeExperience(index)}
-                  >
-                    X
-                  </button>
+                  {index > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => removeExperience(index)}
+                      className="px-4 py-2 bg-red-500 text-white rounded-xl"
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
               ))}
               <button
                 type="button"
-                className="mt-2 px-4 py-2 bg-green-500 text-white rounded-xl"
                 onClick={addExperience}
+                className="px-4 py-2 bg-blue-500 text-white rounded-xl mt-2"
               >
                 Add Experience
               </button>
             </div>
             <div className="flex justify-between mt-4">
               <button
-                onClick={handleBack}
-                className="px-4 py-2 bg-gray-500 text-white rounded-xl"
-              >
-                Back
-              </button>
-              <button
-                onClick={handleNext}
-                className="px-4 py-2 bg-blue-500 text-white rounded-xl"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-
-        {currentTab === 3 && (
-          <div>
-            <h1 className="text-2xl font-semibold mb-4">Select your role</h1>
-            <div className="flex items-center space-x-4">
-              <label className="text-lg font-medium">Job Seeker</label>
-              <input
-                type="radio"
-                name="role"
-                value="jobSeeker"
-                checked={role === "jobSeeker"}
-                onChange={() => setRole("jobSeeker")}
-              />
-              <label className="text-lg font-medium">Entrepreneur</label>
-              <input
-                type="radio"
-                name="role"
-                value="entrepreneur"
-                checked={role === "entrepreneur"}
-                onChange={() => setRole("entrepreneur")}
-              />
-            </div>
-            <div className="flex justify-between mt-4">
-              <button
+                type="button"
                 onClick={handleBack}
                 className="px-4 py-2 bg-gray-500 text-white rounded-xl"
               >
@@ -328,16 +394,24 @@ function SignupForm() {
                 type="submit"
                 className="px-4 py-2 bg-blue-500 text-white rounded-xl"
               >
-                Sign Up
+                Submit
               </button>
             </div>
           </div>
         )}
-
         {isSignupComplete && (
-          <div className="text-center">
-            <h1 className="text-3xl font-semibold">Sign-up Complete!</h1>
-            <p className="text-lg">Welcome to our community!</p>
+          <div className="text-center py-10">
+            <h2 className="text-2xl font-semibold mb-4">Sign-Up Complete!</h2>
+            <p className="text-lg text-gray-500 mb-6">
+              Thank you for signing up. Please proceed to login.
+            </p>
+            <button
+              type="button"
+              onClick={() => loginWithRedirect()}
+              className="px-4 py-2 bg-blue-500 text-white rounded-xl"
+            >
+              Go to Login
+            </button>
           </div>
         )}
       </div>
